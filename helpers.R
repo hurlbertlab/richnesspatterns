@@ -1,8 +1,9 @@
-# Note: percent map is designed to work with the counties data set
-# It may not work correctly with other data sets if their row order does 
-# not exactly match the order in which the maps package plots counties
+# Divides variable into 100 bins for shading with rainbow()
+# Plots map of shaded grid cells
 varMap <- function(var) {
 
+  df = read.table('data/SAM_Western_Hemisphere_1dg_edited.txt', sep = '\t', header = TRUE)
+  
   # generate vector of fill colors for map
   shades <- rainbow(130)[100:1]
   
@@ -15,10 +16,10 @@ varMap <- function(var) {
   rect(df$Longitude - 0.5, df$Latitude - 0.5, df$Longitude + 0.5, df$Latitude + 0.5, col = fills, border = NA)
   
   # add a legend
-  max = max(var, na.rm = TRUE)
-  min = min(var, na.rm = TRUE)
-  inc <- (max - min) / 4
-  legend.text <- round(c(min, min + inc, min + 2 * inc, min + 3 * inc, max))
+  maxvar = max(var, na.rm = TRUE)
+  minvar = min(var, na.rm = TRUE)
+  inc <- (maxvar - minvar) / 4
+  legend.text <- round(c(minvar, minvar + inc, minvar + 2 * inc, minvar + 3 * inc, maxvar))
   
   legend("bottomleft", 
     legend = legend.text, 

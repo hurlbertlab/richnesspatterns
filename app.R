@@ -2,11 +2,11 @@
 # and conducting simple linear regressions between richness and environmental predictors.
 
 library(shiny)
-library(maps)
+
+df = read.table('data/SAM_Western_Hemisphere_1dg_edited.txt', sep = '\t', header = TRUE)
 
 source("helpers.R")
 
-df = read.table('data/SAM_Western_Hemisphere_1dg_edited.txt', sep = '\t', header = TRUE)
 
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
@@ -20,6 +20,7 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
       
+      helpText("Data are from Rangel et al. 2010's Spatial Analysis in Macroecology."),
       helpText("Choose the taxonomic group whose diversity you'd like to map, and an environmental predictor."),
       
       radioButtons(inputId = "taxon",
@@ -52,7 +53,7 @@ ui <- fluidPage(
       
       fluidRow( 
         verticalLayout( 
-          splitLayout(cellWidths = c("50%", "50%"), plotOutput("taxaMap"), plotOutput("envMap")), 
+          splitLayout(cellWidths = c("50%", "50%"), plotOutput("envMap"), plotOutput("taxaMap")), 
           plotOutput("scatterPlot"))
       ) 
     )
@@ -89,7 +90,7 @@ server <- function(input, output) {
                     "PET" = df$PET,
                     "Topographical Range" = df$Topographical_Range)
       
-      plot(env, taxon, ylab = "Species richness", pch = 16)
+      plot(env, taxon, ylab = "Species richness", xlab = input$env, pch = 16)
     
       linmod = lm(taxon~env)
     
@@ -101,18 +102,6 @@ server <- function(input, output) {
   })
   
 
-  output$envMap <- renderPlot({
-    
-    taxon <- switch(input$taxon, 
-                    "Birds" = df$Bird_Richness,
-                    "Mammals" = df$Mammal_Richness,
-                    "Amphibians" = df$Amphibian_Richness)
-    
-    varMap(taxon)
-    
-
-  })
-  
   output$taxaMap <- renderPlot({
     
     env <- switch(input$env, 
@@ -134,10 +123,24 @@ server <- function(input, output) {
                   "Topographical Range" = df$Topographical_Range)
     
     varMap(env)
-    
+    mtext(input$env, 3)
     
   })
 
+  output$envMap <- renderPlot({
+    
+    taxon <- switch(input$taxon, 
+                    "Birds" = df$Bird_Richness,
+                    "Mammals" = df$Mammal_Richness,
+                    "Amphibians" = df$Amphibian_Richness)
+    
+    varMap(taxon)
+    mtext("Species richness", 3)
+    
+    
+  })
+  
+  
 }
 
 
