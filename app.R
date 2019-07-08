@@ -2,10 +2,33 @@
 # and conducting simple linear regressions between richness and environmental predictors.
 
 library(shiny)
+library(shinyBS)
 
 df = read.table('data/SAM_Western_Hemisphere_1dg_edited.txt', sep = '\t', header = TRUE)
 
 source("helpers.R")
+
+radioTooltip <- function(id, choice, title, placement = "bottom", trigger = "hover", options = NULL){
+  
+  options = shinyBS:::buildTooltipOrPopoverOptionsList(title, placement, trigger, options)
+  options = paste0("{'", paste(names(options), options, sep = "': '", collapse = "', '"), "'}")
+  bsTag <- shiny::tags$script(shiny::HTML(paste0("
+    $(document).ready(function() {
+      setTimeout(function() {
+        $('input', $('#", id, "')).each(function(){
+          if(this.getAttribute('value') == '", choice, "') {
+            opts = $.extend(", options, ", {html: true});
+            $(this.parentElement).tooltip('destroy');
+            $(this.parentElement).tooltip(opts);
+          }
+        })
+      }, 500)
+    });
+  ")))
+  htmltools::attachDependencies(bsTag, shinyBS:::shinyBSDep)
+}
+
+
 
 
 # Define UI for app that draws a histogram ----
@@ -44,8 +67,25 @@ ui <- fluidPage(
                               "NDVI", 
                               "Topographical Average",
                               "Topographical Range",
-                              "Ecoregion Count"))
-      
+                              "Ecoregion Count")),
+
+    radioTooltip(id = "env", choice = "Annual Mean Temperature", title = "Button 1 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Mean Temperature of Warmest Quarter", title = "Button 2 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Mean Temperature of Coldest Quarter", title = "Button 3 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Mean Temperature Diurnal Range", title = "Button 1 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Isothermality", title = "Button 2 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Mean Relative Humidity", title = "Button 3 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Mean Annual Precipitation", title = "Button 1 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Precipitation Seasonality", title = "Button 2 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Precipitation in Wettest Quarter", title = "Button 3 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Precipitation in Driest Quarter", title = "Button 1 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "PET", title = "Button 2 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "AET", title = "Button 3 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "NDVI", title = "Button 3 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Topographical Average", title = "Button 1 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Topographical Range", title = "Button 2 Explanation", placement = "right", trigger = "hover"),
+    radioTooltip(id = "env", choice = "Ecoregion Count", title = "Button 3 Explanation", placement = "right", trigger = "hover")
+    
     ),
     
     # Main panel for displaying outputs ----
